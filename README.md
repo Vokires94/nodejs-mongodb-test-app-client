@@ -1,4 +1,4 @@
-# ReactNativeNavigation expo project
+# ReactNative auth client expo project
 
 # Run in emulator
 
