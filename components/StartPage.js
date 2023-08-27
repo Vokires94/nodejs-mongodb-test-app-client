@@ -13,7 +13,6 @@ export default function StartPage({ navigation, route }) {
             // remove error
             console.log('Error:', error)
         }
-        console.log('Done.')
     }
 
     const logout = async () => {
@@ -28,16 +27,12 @@ export default function StartPage({ navigation, route }) {
         ).then((response) => response.json())
             .then(
                 (result) => {
-                    console.log('result:', result);
                     removeValues(['token', 'email']);
                     setTimeout(() => navigation.navigate('Login'), 2000);
                 },
                 (error) => {
                     console.log('error:', error);
                 })
-            .finally(() => {
-                console.log('Done');
-            });
     };
 
     return (

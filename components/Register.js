@@ -159,9 +159,6 @@ export default function Register({ navigation }) {
                 (error) => {
                     console.log(error);
                 })
-            .finally(() => {
-                console.log('Done');
-            });
     };
 
     const onSubmit = () => {
