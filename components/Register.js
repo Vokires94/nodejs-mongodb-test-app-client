@@ -30,7 +30,7 @@ export default function Register({ navigation }) {
 
     useEffect(() => {
 
-        checkToken();
+        checkToken(navigation);
 
         const keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
@@ -145,13 +145,13 @@ export default function Register({ navigation }) {
                             visibilityTime: 3000,
                         });
                         AsyncStorage.setItem('token', data.result.token);
-                        setTimeout(() => navigation.navigate('StartPage', {
-                            email,
-                        }), 3000);
+                        AsyncStorage.setItem('email', data.result.email);
+                        setTimeout(() =>
+                            navigation.dispatch(StackActions.replace('StartPage', { email })), 3000);
                     } else {
                         Toast.show({
                             type: 'error',
-                            text1: result.message,
+                            text1: data.message,
                             visibilityTime: 3000,
                         });
                     }

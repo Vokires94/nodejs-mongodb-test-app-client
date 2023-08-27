@@ -6,6 +6,16 @@ export default function StartPage({ navigation, route }) {
 
     const { email } = route.params;
 
+    const removeValues = async (keys) => {
+        try {
+            await AsyncStorage.multiRemove(keys)
+        } catch (e) {
+            // remove error
+            console.log('Error:', error)
+        }
+        console.log('Done.')
+    }
+
     const logout = async () => {
         await fetch(
             "https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/logout", {
@@ -18,12 +28,12 @@ export default function StartPage({ navigation, route }) {
         ).then((response) => response.json())
             .then(
                 (result) => {
-                    console.log(result);
-                    AsyncStorage.removeItem('@token');
+                    console.log('result:', result);
+                    removeValues(['token', 'email']);
                     setTimeout(() => navigation.navigate('Login'), 2000);
                 },
                 (error) => {
-                    console.log(error);
+                    console.log('error:', error);
                 })
             .finally(() => {
                 console.log('Done');
