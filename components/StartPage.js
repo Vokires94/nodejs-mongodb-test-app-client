@@ -6,21 +6,24 @@ import { DataTable, TextInput } from "react-native-paper";
 import moment from "moment";
 import MultiSelectDropdown from "./MultiselectDropdown";
 import { Toast } from 'react-native-toast-message/lib/src/Toast';
+import UpdateRowDialog from "./UpdateRowDialog";
 
 export default function StartPage({ navigation, route }) {
 
     const { email } = route.params;
-    const [amount, setAmount] = React.useState("");
+    const [amount, setAmount] = React.useState(MIN_PRICE);
     const [row, setRowForDelete] = React.useState(0);
     const [selectedItems, setSelectedItems] = React.useState([]);
     const [products, setProducts] = useState([]);
     const [page, setPage] = React.useState(0);
-    const [numberOfItemsPerPageList] = React.useState([4]);
+    const [numberOfItemsPerPageList] = React.useState([2, 3, 4, 5]);
     const [itemsPerPage, onItemsPerPageChange] = React.useState(
-        numberOfItemsPerPageList[0]
+        numberOfItemsPerPageList[numberOfItemsPerPageList.length - 1]
     );
+    const [isDialogOpen, setDialogOpen] = useState(false);
     const from = page * itemsPerPage;
     const to = Math.min((page + 1) * itemsPerPage, products.length);
+    const MIN_PRICE = '1$';
 
     const DATA_ITEMS = [
         { label: 'Cupcake', value: '1' },
@@ -92,6 +95,46 @@ export default function StartPage({ navigation, route }) {
                 })
     };
 
+    const addRow = async () => {
+        const newProducts = [];
+        DATA_ITEMS.forEach((element) => {
+            if (selectedItems.includes(element.value)) {
+                newProducts.push(element.label);
+            }
+        });
+        if (newProducts) {
+            await fetch(
+                'https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products/add', {
+                method: 'POST',
+                body: JSON.stringify({ "items": newProducts, "amount": amount || MIN_PRICE }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }
+            ).then((response) => response.json())
+                .then(
+                    () => {
+                        Toast.show({
+                            type: 'success',
+                            text1: `Product was created`,
+                            visibilityTime: 3000,
+                        });
+                        setSelectedItems([]);
+                        setAmount(MIN_PRICE)
+                        productsData();
+                    },
+                    (error) => {
+                        console.log('error:', error);
+                    })
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: `Select at least one product`,
+                visibilityTime: 3000,
+            });
+        }
+    };
+
     const deleteRow = async () => {
         const rowDeleted = products[row];
         if (rowDeleted) {
@@ -146,6 +189,40 @@ export default function StartPage({ navigation, route }) {
                 })
     };
 
+    const updateRow = async (rowNumber, items, amount) => {
+        const uniqueId = products[rowNumber].id;
+        const selectedProducts = [];
+        DATA_ITEMS.forEach((element) => {
+            if (items.includes(element.value)) {
+                selectedProducts.push(element.label);
+            }
+        });
+        await fetch(
+            `https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products/update`, {
+            method: 'POST',
+            body: JSON.stringify({ "id": uniqueId, "items": selectedProducts, "amount": amount || MIN_PRICE }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => response.json())
+            .then(
+                (result) => {
+                    Toast.show({
+                        type: 'success',
+                        text1: result.message,
+                        visibilityTime: 3000,
+                    });
+                    productsData();
+                },
+                (error) => {
+                    console.log('error:', error);
+                })
+    };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+    }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.actionBlock}>
@@ -154,29 +231,34 @@ export default function StartPage({ navigation, route }) {
                     <TextInput
                         style={{ ...styles.textInput }}
                         underlineColor="grey"
-                        activeOutlineColor="red"
-                        activeUnderlineColor="red"
+                        activeOutlineColor="grey"
+                        activeUnderlineColor="grey"
                         label="Amount"
                         value={amount}
                         onChangeText={text => setAmount(text)}
                     />
-                    <TouchableOpacity style={styles.btn}>
-                        <Text style={styles.btnText}>Add</Text>
-                    </TouchableOpacity>
+                    <View style={styles.btnWrapper}>
+                        <TouchableOpacity onPress={addRow} style={styles.btn}>
+                            <Text style={styles.btnText}>Add</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={deleteRow} style={styles.btn}>
+                            <Text style={styles.btnText}>Delete</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setDialogOpen(true)} style={styles.btn}>
+                            <Text style={styles.btnText}>Update</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <View style={styles.bntContainer}>
                     <TextInput
                         style={{ ...styles.textInput }}
                         underlineColor="grey"
-                        activeOutlineColor="red"
-                        activeUnderlineColor="red"
+                        activeOutlineColor="grey"
+                        activeUnderlineColor="grey"
                         label="Row"
                         value={row}
                         onChangeText={text => setRowForDelete(text)}
                     />
-                    <TouchableOpacity onPress={deleteRow} style={styles.btn}>
-                        <Text style={styles.btnText}>Delete</Text>
-                    </TouchableOpacity>
                 </View>
                 <View style={styles.bntContainer}>
                     <TouchableOpacity onPress={logout} style={[styles.btn, styles.btnLogout]}>
@@ -219,6 +301,13 @@ export default function StartPage({ navigation, route }) {
                     />
                 </DataTable>
             </View>
+            <UpdateRowDialog
+                open={isDialogOpen}
+                close={() => closeDialog()}
+                update={updateRow}
+                minPrice={MIN_PRICE}
+                dataItems={DATA_ITEMS}
+            />
         </ScrollView>
     );
 }
@@ -242,6 +331,10 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         paddingRight: 8,
     },
+    btnWrapper: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
     btn: {
         width: 100,
         borderRadius: 25,
@@ -250,7 +343,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: 8,
         marginRight: 8,
-        marginLeft: 8,
+        marginLeft: 4,
         backgroundColor: "#61dafb",
     },
     btnLogout: {
@@ -267,8 +360,5 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 14,
         borderTopLeftRadius: 14,
         backgroundColor: '#FFFFFF',
-    },
-    tableBlock: {
-        
     },
 });
