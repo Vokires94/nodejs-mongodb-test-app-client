@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Vokires node_mongo_react-native",
-    "slug": "authtableAPI",
+    "slug": "vnavigation",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
