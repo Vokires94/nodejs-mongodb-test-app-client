@@ -146,6 +146,7 @@ export default function Register({ navigation }) {
                         });
                         AsyncStorage.setItem('token', data.result.token);
                         AsyncStorage.setItem('email', data.result.email);
+                        AsyncStorage.setItem('userId', data.result.userId);
                         setTimeout(() =>
                             navigation.dispatch(StackActions.replace('StartPage', { email })), 3000);
                     } else {

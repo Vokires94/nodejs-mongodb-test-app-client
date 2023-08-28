@@ -117,6 +117,7 @@ export default function Login({ navigation }) {
                         });
                         AsyncStorage.setItem('token', result.token);
                         AsyncStorage.setItem('email', result.email);
+                        AsyncStorage.setItem('userId', result.userId);
                         setTimeout(() =>
                             navigation.dispatch(StackActions.replace('StartPage', { email })), 3000);
                     } else {

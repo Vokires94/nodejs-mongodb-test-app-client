@@ -58,8 +58,9 @@ export default function StartPage({ navigation, route }) {
     }
 
     const productsData = async () => {
+        const userId = await AsyncStorage.getItem('userId');
         await fetch(
-            "https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products", {
+            `https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products?id=${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -97,6 +98,7 @@ export default function StartPage({ navigation, route }) {
     };
 
     const addRow = async () => {
+        const userId = await AsyncStorage.getItem('userId');
         const newProducts = [];
         DATA_ITEMS.forEach((element) => {
             if (selectedItems.includes(element.value)) {
@@ -107,7 +109,7 @@ export default function StartPage({ navigation, route }) {
             await fetch(
                 'https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products/add', {
                 method: 'POST',
-                body: JSON.stringify({ "items": newProducts, "amount": amount || MIN_PRICE }),
+                body: JSON.stringify({ "user": userId, "items": newProducts, "amount": amount || MIN_PRICE }),
                 headers: {
                     'Content-Type': 'application/json'
                 },
