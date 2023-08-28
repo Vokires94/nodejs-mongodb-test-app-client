@@ -156,8 +156,12 @@ export default function Register({ navigation }) {
                         });
                     }
                 },
-                (error) => {
-                    console.log(error);
+                () => {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        visibilityTime: 3000,
+                    });
                 })
     };
 

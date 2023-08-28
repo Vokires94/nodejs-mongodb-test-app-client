@@ -12,7 +12,7 @@ export default function StartPage({ navigation, route }) {
 
     const { email } = route.params;
     const [amount, setAmount] = React.useState(MIN_PRICE);
-    const [row, setRowForDelete] = React.useState(0);
+    const [row, setRowForDelete] = React.useState(1);
     const [selectedItems, setSelectedItems] = React.useState([]);
     const [products, setProducts] = useState([]);
     const [page, setPage] = React.useState(0);
@@ -55,7 +55,6 @@ export default function StartPage({ navigation, route }) {
 
     const selectItems = (item) => {
         setSelectedItems(item);
-        console.log(item);
     }
 
     const productsData = async () => {
@@ -70,7 +69,6 @@ export default function StartPage({ navigation, route }) {
             .then(
                 (data) => {
                     if (data.result) {
-                        console.log('Success');
                         setProducts(
                             data.result.map((data, index) => {
                                 return {
@@ -89,9 +87,12 @@ export default function StartPage({ navigation, route }) {
                         });
                     }
                 },
-                (error) => {
-                    console.log('Error fail');
-                    console.log(error);
+                () => {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        visibilityTime: 3000,
+                    });
                 })
     };
 
@@ -123,8 +124,12 @@ export default function StartPage({ navigation, route }) {
                         setAmount(MIN_PRICE)
                         productsData();
                     },
-                    (error) => {
-                        console.log('error:', error);
+                    () => {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            visibilityTime: 3000,
+                        });
                     })
         } else {
             Toast.show({
@@ -136,7 +141,7 @@ export default function StartPage({ navigation, route }) {
     };
 
     const deleteRow = async () => {
-        const rowDeleted = products[row];
+        const rowDeleted = products[row - 1];
         if (rowDeleted) {
             await fetch(
                 `https://nodejs-mongodb-auth-test-app-f4acf31e7430.herokuapp.com/products/delete?id=${rowDeleted.id}`, {
@@ -153,11 +158,15 @@ export default function StartPage({ navigation, route }) {
                             text1: `Row was deleted`,
                             visibilityTime: 3000,
                         });
-                        setRowForDelete(0);
+                        setRowForDelete(1);
                         productsData();
                     },
-                    (error) => {
-                        console.log('error:', error);
+                    () => {
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Error',
+                            visibilityTime: 3000,
+                        });
                     })
         } else {
             Toast.show({
@@ -184,13 +193,17 @@ export default function StartPage({ navigation, route }) {
 
                     setTimeout(() => navigation.dispatch(StackActions.replace('Login', { email })), 3000);
                 },
-                (error) => {
-                    console.log('error:', error);
+                () => {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        visibilityTime: 3000,
+                    });
                 })
     };
 
     const updateRow = async (rowNumber, items, amount) => {
-        const uniqueId = products[rowNumber].id;
+        const uniqueId = products[rowNumber + 1].id;
         const selectedProducts = [];
         DATA_ITEMS.forEach((element) => {
             if (items.includes(element.value)) {
@@ -214,8 +227,12 @@ export default function StartPage({ navigation, route }) {
                     });
                     productsData();
                 },
-                (error) => {
-                    console.log('error:', error);
+                () => {
+                    Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        visibilityTime: 3000,
+                    });
                 })
     };
 

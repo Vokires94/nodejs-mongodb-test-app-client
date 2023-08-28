@@ -13,7 +13,7 @@ import { StyleSheet } from "react-native";
 const UpdateRowDialog = (props) => {
 
     const [isLoading, setIsLoading] = useState(false);
-    const [row, setRow] = React.useState(0);
+    const [row, setRow] = React.useState(1);
     const [amount, setAmount] = React.useState(props.minPrice);
     const [selectedItems, setSelectedItems] = React.useState([]);
 
@@ -35,7 +35,6 @@ const UpdateRowDialog = (props) => {
 
     const selectItems = (item) => {
         setSelectedItems(item);
-        console.log(item);
     }
 
     return (
